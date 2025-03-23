@@ -1,0 +1,339 @@
+{
+    "info": {
+        "name": "Pledge API",
+        "description": "API collection for the Pledge System",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["auth", "login"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}"
+                        }
+                    },
+                    "response": [],
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has token\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response).to.have.property(\"access_token\");",
+                                    "    pm.environment.set(\"token\", response.access_token);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Members",
+            "item": [
+                {
+                    "name": "List Members",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/members",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "members"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Member",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/members",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "members"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"John Doe\",\n    \"phone_number\": \"+254712345678\",\n    \"email\": \"john@example.com\"\n}"
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Groups",
+            "item": [
+                {
+                    "name": "List Groups",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/groups",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "groups"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Group",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/groups",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "groups"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test Group\",\n    \"description\": \"Test Description\",\n    \"members\": [1, 2, 3]\n}"
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Projects",
+            "item": [
+                {
+                    "name": "List Projects",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/projects",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "projects"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Project",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/projects",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "projects"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test Project\",\n    \"description\": \"Test Description\",\n    \"target_amount\": 100000,\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2024-12-31\"\n}"
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Contributions",
+            "item": [
+                {
+                    "name": "List Contributions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/contributions",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "contributions"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Contribution",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/contributions",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "contributions"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"member_id\": 1,\n    \"project_id\": 1,\n    \"amount\": 1000,\n    \"payment_method\": \"MPESA\",\n    \"transaction_id\": \"QWERTY123\"\n}"
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Reports",
+            "item": [
+                {
+                    "name": "Generate Report",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/reports",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "reports"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"report_type\": \"contributions\",\n    \"start_date\": \"2024-01-01\",\n    \"end_date\": \"2024-12-31\",\n    \"format\": \"pdf\"\n}"
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "SMS",
+            "item": [
+                {
+                    "name": "Send SMS",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/sms",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "sms"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"phone_number\": \"+254712345678\",\n    \"message\": \"Test message\"\n}"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Send Bulk SMS",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/sms/bulk",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "v1", "sms", "bulk"]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"group_id\": 1,\n    \"message\": \"Test message\"\n}"
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+} 
