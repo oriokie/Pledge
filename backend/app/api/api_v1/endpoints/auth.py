@@ -30,7 +30,7 @@ def login(
         raise HTTPException(status_code=400, detail="Inactive user")
     
     access_token = security.create_access_token(
-        user.id, user.role
+        subject=user.id, role=user.role
     )
     return {
         "access_token": access_token,

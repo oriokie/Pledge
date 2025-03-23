@@ -1,46 +1,38 @@
 from typing import Optional
-from enum import Enum
 from pydantic import BaseModel, Field, EmailStr, constr
 from .base import BaseSchema, TimestampSchema
 from ..models.user import UserRole
 from datetime import datetime
 
 class UserBase(BaseModel):
-    email: EmailStr
-    full_name: str
-    phone_number: Optional[str] = None
-    role: UserRole = UserRole.USER
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    full_name: Optional[str] = None
+    role: UserRole = UserRole.MEMBER
     is_active: bool = True
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8)
+    email: EmailStr
+    phone: str
+    full_name: str
+    password: str
 
-class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = None
-    full_name: Optional[str] = None
-    phone_number: Optional[str] = None
-    password: Optional[str] = Field(None, min_length=8)
-    role: Optional[UserRole] = None
-    is_active: Optional[bool] = None
+class UserUpdate(UserBase):
+    password: Optional[str] = None
 
-class UserInDB(UserBase, TimestampSchema):
-    id: int
-    hashed_password: str
-
-    class Config:
-        from_attributes = True
-
-class User(UserBase):
+class UserInDBBase(UserBase):
     id: int
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
-class UserRole(str, Enum):
-    ADMIN = "admin"
-    USER = "user"
+class User(UserInDBBase):
+    pass
+
+class UserInDB(UserInDBBase):
+    hashed_password: str
 
 class Token(BaseModel):
     access_token: str

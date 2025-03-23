@@ -1,17 +1,25 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from .base import Base
+from sqlalchemy.sql import func
+
+from app.database import Base
 
 class Member(Base):
+    __tablename__ = "members"
+
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    phone_number = Column(String, unique=True, index=True)
-    alias1 = Column(String, nullable=True)
-    alias2 = Column(String, nullable=True)
-    unique_code = Column(String, unique=True, index=True)
-    created_by_id = Column(Integer, ForeignKey("user.id"))
-    
+    full_name = Column(String, index=True)
+    phone = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, nullable=True)
+    member_code = Column(String, unique=True, index=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_by_id = Column(Integer, ForeignKey("users.id"))
+
     # Relationships
     created_by_user = relationship("User", back_populates="created_members")
-    groups = relationship("GroupMember", back_populates="member")
-    contributions = relationship("Contribution", back_populates="member") 
+    contributions = relationship("Contribution", back_populates="member")
+    groups = relationship("Group", secondary="group_member", back_populates="members")
+    sms_messages = relationship("SMS", back_populates="member")
+    notifications = relationship("Notification", back_populates="member") 

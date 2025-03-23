@@ -14,6 +14,7 @@ class Project(Base):
     end_date = Column(DateTime, nullable=True)
     status = Column(String, default="active")
     is_active = Column(Boolean, default=True)
+    created_by_id = Column(Integer, ForeignKey("users.id"))
     
     # Relationships
     groups = relationship("Group", back_populates="project")

@@ -1,9 +1,9 @@
-from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Enum as SQLEnum
+from enum import Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, Enum as SQLAlchemyEnum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from ..database import Base
-from enum import Enum
+
+from app.database import Base
 
 class SMSStatus(str, Enum):
     PENDING = "pending"
@@ -15,13 +15,16 @@ class SMS(Base):
     __tablename__ = "sms"
 
     id = Column(Integer, primary_key=True, index=True)
-    phone_number = Column(String, nullable=False)
-    message = Column(Text, nullable=False)
-    status = Column(SQLEnum(SMSStatus), default=SMSStatus.PENDING)
+    message = Column(Text)
+    recipient = Column(String)
+    status = Column(SQLAlchemyEnum(SMSStatus), default=SMSStatus.PENDING)
+    message_id = Column(String, unique=True)
+    sent_at = Column(DateTime(timezone=True), server_default=func.now())
+    delivered_at = Column(DateTime(timezone=True), nullable=True)
     error_message = Column(Text, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    sent_at = Column(DateTime, nullable=True)
-    member_id = Column(Integer, ForeignKey("members.id"), nullable=True)
-    
+    user_id = Column(Integer, ForeignKey("users.id"))
+    member_id = Column(Integer, ForeignKey("members.id"))
+
+    # Relationships
+    user = relationship("User", back_populates="sms_messages")
     member = relationship("Member", back_populates="sms_messages") 

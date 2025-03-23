@@ -233,4 +233,38 @@ class UserService:
                 ]
             }
         except Exception as e:
-            return {"status": "error", "message": str(e)} 
+            return {"status": "error", "message": str(e)}
+
+    def get(self, user_id: int) -> Optional[User]:
+        return self.db.query(User).filter(User.id == user_id).first()
+
+    def get_by_email(self, email: str) -> Optional[User]:
+        return self.db.query(User).filter(User.email == email).first()
+
+    def get_by_phone(self, phone: str) -> Optional[User]:
+        return self.db.query(User).filter(User.phone_number == phone).first()
+
+    def authenticate(self, phone: str, password: str) -> Optional[User]:
+        user = self.get_by_phone(phone)
+        if not user:
+            return None
+        if not verify_password(password, user.hashed_password):
+            return None
+        return user
+
+    def update(self, db_obj: User, obj_in: UserUpdate) -> User:
+        update_data = obj_in.dict(exclude_unset=True)
+        if update_data.get("password"):
+            hashed_password = get_password_hash(update_data["password"])
+            del update_data["password"]
+            update_data["hashed_password"] = hashed_password
+        for field in update_data:
+            setattr(db_obj, field, update_data[field])
+        self.db.add(db_obj)
+        self.db.commit()
+        self.db.refresh(db_obj)
+        return db_obj
+
+    def delete(self, db_obj: User) -> None:
+        self.db.delete(db_obj)
+        self.db.commit() 

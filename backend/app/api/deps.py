@@ -53,7 +53,7 @@ def authenticate_user(
     phone_number: str,
     password: str
 ) -> Optional[User]:
-    user = db.query(User).filter(User.phone_number == phone_number).first()
+    user = db.query(User).filter(User.phone == phone_number).first()
     if not user:
         return None
     if not verify_password(password, user.hashed_password):
