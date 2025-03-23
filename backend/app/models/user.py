@@ -1,7 +1,8 @@
 from enum import Enum
-from sqlalchemy import Column, Integer, String, Boolean, Enum as SQLAlchemyEnum
+from sqlalchemy import Column, Integer, String, Boolean, Enum as SQLAlchemyEnum, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
+from datetime import datetime, UTC
 
 class UserRole(str, Enum):
     ADMIN = "admin"
@@ -18,6 +19,8 @@ class User(Base):
     full_name = Column(String)
     role = Column(SQLAlchemyEnum(UserRole), default=UserRole.MEMBER)
     is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
     # Relationships
     contributions = relationship("Contribution", back_populates="created_by_user")

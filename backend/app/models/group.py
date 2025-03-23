@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from .base import Base
+from app.database import Base
 
 # Association table for many-to-many relationship between groups and members
 group_member = Table(
@@ -16,6 +16,7 @@ class Group(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     created_by_id = Column(Integer, ForeignKey("users.id"))
+    project_id = Column(Integer, ForeignKey("projects.id"))
     
     # Relationships
     created_by_user = relationship("User", back_populates="created_groups")

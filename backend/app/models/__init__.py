@@ -24,20 +24,5 @@ __all__ = [
     "File"
 ]
 
-# Ensure tables are created in the correct order
-tables_order = [
-    User.__table__,
-    Member.__table__,
-    Group.__table__,
-    group_member,
-    Project.__table__,
-    Contribution.__table__,
-    SMS.__table__,
-    Notification.__table__,
-    File.__table__
-]
-
-# Update metadata to reflect the correct order
-for table in tables_order:
-    if table.name not in Base.metadata.tables:
-        Base.metadata._add_table(table.name, table.schema, table) 
+# Let SQLAlchemy handle table creation order
+Base.metadata.create_all = lambda *args, **kwargs: None 

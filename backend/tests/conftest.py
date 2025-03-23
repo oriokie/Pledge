@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from datetime import datetime, UTC
 
 from app.database import Base, get_db
 from app.main import app
@@ -11,17 +12,17 @@ from app.core.security import get_password_hash
 from app.models.user import User, UserRole
 
 # Create test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+SQLALCHEMY_DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URI)
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
     poolclass=StaticPool,
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 @pytest.fixture(scope="session")
 def db():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
@@ -48,7 +49,9 @@ def test_user(db):
         full_name="Test User",
         hashed_password=get_password_hash("testpass123"),
         role=UserRole.MEMBER,
-        is_active=True
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC)
     )
     db.add(user)
     db.commit()
@@ -69,7 +72,9 @@ def admin_user(db):
         full_name="Admin User",
         hashed_password=get_password_hash("adminpass123"),
         role=UserRole.ADMIN,
-        is_active=True
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC)
     )
     db.add(user)
     db.commit()
@@ -90,7 +95,9 @@ def staff_user(db):
         full_name="Staff User",
         hashed_password=get_password_hash("staffpass123"),
         role=UserRole.STAFF,
-        is_active=True
+        is_active=True,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC)
     )
     db.add(user)
     db.commit()
@@ -110,7 +117,8 @@ def admin_token_headers(client, admin_user):
         data={
             "username": admin_user["phone"],
             "password": admin_user["password"]
-        }
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
     tokens = response.json()
     return {"Authorization": f"Bearer {tokens['access_token']}"} 
