@@ -2,10 +2,11 @@ import axios from 'axios';
 import { LoginCredentials, Token, User, Contribution, Pledge, Member, Group } from '@/types';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Enable sending cookies with requests
 });
 
 // Add token to requests if it exists
@@ -17,14 +18,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle 401 responses
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const auth = {
   login: async (credentials: LoginCredentials): Promise<Token> => {
-    const response = await api.post('/auth', credentials);
+    const response = await api.post('/auth/login', credentials);
     return response.data;
   },
   
   getCurrentUser: async (): Promise<User> => {
-    const response = await api.get('/auth');
+    const response = await api.get('/auth/me');
     return response.data;
   },
 };

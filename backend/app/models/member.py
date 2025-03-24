@@ -20,6 +20,7 @@ class Member(Base):
     # Relationships
     created_by_user = relationship("User", back_populates="created_members")
     contributions = relationship("Contribution", back_populates="member")
+    pledges = relationship("Pledge", back_populates="member")
     groups = relationship("Group", secondary="group_member", back_populates="members")
     sms_messages = relationship("SMS", back_populates="member")
     notifications = relationship("Notification", back_populates="member") 

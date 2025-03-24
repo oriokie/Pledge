@@ -75,7 +75,7 @@ export interface Token {
 }
 
 export interface LoginCredentials {
-  phone: string;
+  username: string;
   password: string;
 }
 

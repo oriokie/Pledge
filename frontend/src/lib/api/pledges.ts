@@ -1,10 +1,14 @@
 import { Pledge } from '@/types';
 
-const BASE_URL = '/api/pledges';
+const BASE_URL = '/api/v1/pledges';
 
 export const pledges = {
   getAll: async (): Promise<Pledge[]> => {
-    const response = await fetch(BASE_URL);
+    const response = await fetch(BASE_URL, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch pledges');
     }
@@ -12,7 +16,11 @@ export const pledges = {
   },
 
   getById: async (id: number): Promise<Pledge> => {
-    const response = await fetch(`${BASE_URL}/${id}`);
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch pledge');
     }
@@ -24,6 +32,7 @@ export const pledges = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(data),
     });
@@ -38,6 +47,7 @@ export const pledges = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(data),
     });
@@ -50,6 +60,9 @@ export const pledges = {
   delete: async (id: number): Promise<void> => {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
     });
     if (!response.ok) {
       throw new Error('Failed to delete pledge');

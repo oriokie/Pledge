@@ -10,15 +10,15 @@ class UserBase(BaseModel):
     
     Attributes:
         email: User's email address (optional)
-        phone: User's phone number (optional)
+        phone_number: User's phone number (optional)
         full_name: User's full name (optional)
         role: User's role (default: member)
         is_active: Whether the user account is active (default: true)
     """
     email: Optional[EmailStr] = None
-    phone: Optional[str] = None
+    phone_number: Optional[str] = None
     full_name: Optional[str] = None
-    role: UserRole = UserRole.MEMBER
+    role: UserRole = UserRole.STAFF
     is_active: bool = True
 
 class UserCreate(UserBase):
@@ -29,12 +29,12 @@ class UserCreate(UserBase):
     
     Attributes:
         email: User's email address (required)
-        phone: User's phone number (required)
+        phone_number: User's phone number (required)
         full_name: User's full name (required)
         password: User's password (required)
     """
     email: EmailStr
-    phone: str
+    phone_number: str
     full_name: str
     password: str
 

@@ -16,12 +16,11 @@ def create_admin_user(session) -> None:
         session: SQLAlchemy database session
     """
     # Check if admin user exists
-    admin = session.query(User).filter(User.email == "admin@pledge.com").first()
+    admin = session.query(User).filter(User.phone_number == "+254700000000").first()
     
     if not admin:
         admin = User(
-            email="admin@pledge.com",
-            phone="+254700000000",
+            phone_number="0700000000",
             full_name="System Administrator",
             hashed_password=get_password_hash("admin123"),  # Change this in production!
             role="ADMIN",
@@ -79,7 +78,7 @@ def init_db(database_url: str, database_name: str) -> None:
 def main():
     """Initialize both test and production databases."""
     # Get the base database URL (without database name)
-    base_db_url = settings.SQLALCHEMY_DATABASE_URL.rsplit("/", 1)[0]
+    base_db_url = str(settings.SQLALCHEMY_DATABASE_URI).rsplit("/", 1)[0]
     
     # Initialize production database
     print("\nInitializing production database...")

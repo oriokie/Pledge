@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (phone: string, password: string) => {
     try {
       setLoading(true);
-      const { access_token } = await auth.login({ phone, password });
+      const { access_token } = await auth.login({ username: phone, password });
       localStorage.setItem('token', access_token);
       await checkUser();
     } catch (err) {

@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, List, Union
 from pydantic_settings import BaseSettings
 from pydantic import PostgresDsn, validator, AnyHttpUrl, EmailStr, HttpUrl, field_validator
 import os
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,7 +20,7 @@ class Settings(BaseSettings):
     # Database
     POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "localhost")
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "")
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "pledge")
     SQLALCHEMY_DATABASE_URI: PostgresDsn = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}/{POSTGRES_DB}"
 
@@ -68,10 +69,15 @@ class Settings(BaseSettings):
     STRIPE_WEBHOOK_SECRET: Optional[str] = None
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            try:
+                # Try to parse as JSON array
+                return json.loads(v)
+            except json.JSONDecodeError:
+                # If not JSON, try comma-separated string
+                return [i.strip() for i in v.split(",")]
+        elif isinstance(v, list):
             return v
         raise ValueError(v)
 

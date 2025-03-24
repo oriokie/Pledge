@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 const schema = yup.object().shape({
-  phone: yup.string().required('Phone number is required'),
+  username: yup.string().required('Phone number is required'),
   password: yup.string().required('Password is required'),
 });
 
@@ -31,7 +31,7 @@ export default function LoginPage() {
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      await login(data.phone, data.password);
+      await login(data.username, data.password);
       router.push('/dashboard');
       toast.success('Login successful');
     } catch (error) {
@@ -52,17 +52,17 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="phone" className="sr-only">
+              <label htmlFor="username" className="sr-only">
                 Phone Number
               </label>
               <input
-                {...register('phone')}
+                {...register('username')}
                 type="tel"
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Phone Number"
               />
-              {errors.phone && (
-                <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
               )}
             </div>
             <div>

@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const formData = new URLSearchParams();
-    formData.append('username', body.phone_number);
+    formData.append('username', body.username);
     formData.append('password', body.password);
 
     const response = await fetch(`${BACKEND_URL}/api/v1/auth/login`, {

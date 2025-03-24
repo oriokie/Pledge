@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, members, groups, contributions, sms, reports
+from app.api.v1.endpoints import auth, users, members, groups, contributions, sms, reports, pledges
 
 api_router = APIRouter()
 
@@ -10,4 +10,5 @@ api_router.include_router(members.router, prefix="/members", tags=["members"])
 api_router.include_router(groups.router, prefix="/groups", tags=["groups"])
 api_router.include_router(contributions.router, prefix="/contributions", tags=["contributions"])
 api_router.include_router(sms.router, prefix="/sms", tags=["sms"])
-api_router.include_router(reports.router, prefix="/reports", tags=["reports"]) 
+api_router.include_router(reports.router, prefix="/reports", tags=["reports"])
+api_router.include_router(pledges.router, prefix="/pledges", tags=["pledges"]) 
