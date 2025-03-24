@@ -42,6 +42,13 @@ def login_access_token(
         "token_type": "bearer",
     }
 
+@router.get("/me", response_model=User)
+def read_users_me(current_user: User = Depends(get_current_user)) -> Any:
+    """
+    Get current user.
+    """
+    return current_user
+
 @router.post("/test-token", response_model=User)
 def test_token(current_user: User = Depends(get_current_user)) -> Any:
     """

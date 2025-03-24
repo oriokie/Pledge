@@ -1,139 +1,97 @@
-# Church Pledging Application
+# Pledge - Contribution Management System
 
-A comprehensive church pledging and contribution management system built with FastAPI and Next.js.
+A FastAPI-based backend for managing contributions and pledges.
 
 ## Features
 
-- Phone number-based authentication
-- Member management with alias names
-- Group contributions tracking
-- Project/fundraising campaign management
-- SMS notifications via Advanta SMS
-- Role-based access control (Admin/Staff)
-- Advanced search functionality
-- Excel report generation
-- Real-time dashboard
+- User authentication with JWT tokens
+- Role-based access control (Admin, Staff, Member)
+- Contribution management
+- Pledge tracking
+- Email notifications
+- Redis caching
+- PostgreSQL database
 
-## Backend Setup
+## Prerequisites
 
-1. Create a virtual environment:
+- Python 3.8+
+- PostgreSQL
+- Redis
+- Virtual environment (recommended)
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/pledge.git
+cd pledge
+```
+
+2. Create and activate a virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-2. Install dependencies:
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
+4. Set up environment variables:
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
-4. Set up the database:
+## Database Setup
+
+1. Make sure PostgreSQL is running and accessible
+
+2. Initialize the databases:
 ```bash
-# Start PostgreSQL service
-# Create database named 'church_pledging'
+cd backend
+./init_db.sh
 ```
 
-5. Start Redis server:
+This will:
+- Create the production database named "pledge"
+- Create the test database named "test_pledge"
+- Create all necessary tables
+- Create the initial admin user in both databases
+
+Default admin credentials:
+- Email: admin@pledge.com
+- Phone: +254700000000
+- Password: admin123
+
+**Important**: Change the admin password in production!
+
+## Running the Application
+
+1. Start the backend server:
 ```bash
-# Start Redis service
+cd backend
+uvicorn app.main:app --reload
 ```
 
-6. Run database migrations:
-```bash
-alembic upgrade head
-```
+2. Access the API documentation:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
-7. Start the FastAPI server:
-```bash
-uvicorn backend.app.main:app --reload
-```
+## Testing
 
-8. Start Celery worker (in a separate terminal):
+Run the test suite:
 ```bash
-celery -A backend.app.core.celery_app worker --loglevel=info
+cd backend
+pytest
 ```
 
 ## API Documentation
 
-Once the server is running, you can access:
+The API documentation is available at:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
-
-## Environment Variables
-
-Required environment variables (see `.env.example`):
-- Database configuration
-- Redis configuration
-- JWT settings
-- SMS API credentials
-
-## Project Structure
-
-```
-backend/
-├── app/
-│   ├── api/
-│   │   └── v1/
-│   ├── core/
-│   ├── db/
-│   ├── models/
-│   ├── schemas/
-│   ├── services/
-│   └── utils/
-├── tests/
-└── alembic/
-```
-
-## API Endpoints
-
-### Authentication
-- `POST /api/v1/auth/login`
-- `POST /api/v1/auth/logout`
-
-### Users (Admin/Staff)
-- `GET /api/v1/users`
-- `POST /api/v1/users`
-- `PUT /api/v1/users/{user_id}`
-- `DELETE /api/v1/users/{user_id}`
-
-### Members
-- `GET /api/v1/members`
-- `POST /api/v1/members`
-- `PUT /api/v1/members/{member_id}`
-- `DELETE /api/v1/members/{member_id}`
-
-### Groups
-- `GET /api/v1/groups`
-- `POST /api/v1/groups`
-- `PUT /api/v1/groups/{group_id}`
-- `DELETE /api/v1/groups/{group_id}`
-
-### Projects
-- `GET /api/v1/projects`
-- `POST /api/v1/projects`
-- `PUT /api/v1/projects/{project_id}`
-- `DELETE /api/v1/projects/{project_id}`
-
-### Contributions
-- `GET /api/v1/contributions`
-- `POST /api/v1/contributions`
-- `PUT /api/v1/contributions/{contribution_id}`
-- `DELETE /api/v1/contributions/{contribution_id}`
-
-### Reports
-- `GET /api/v1/reports/projects/{project_id}`
-- `GET /api/v1/reports/groups/{group_id}`
-- `GET /api/v1/reports/download`
-
-### SMS
-- `POST /api/v1/sms/send`
-- `POST /api/v1/sms/send-bulk`
 
 ## Contributing
 
@@ -145,4 +103,4 @@ backend/
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License - see the LICENSE file for details. 
