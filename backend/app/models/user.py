@@ -28,5 +28,5 @@ class User(Base):
     # Additional relationships
     created_members = relationship("Member", back_populates="created_by_user")
     created_groups = relationship("Group", back_populates="created_by_user")
-    created_projects = relationship("Project", back_populates="created_by_user")
+    projects = relationship("Project", back_populates="created_by")
     pledges = relationship("Pledge", back_populates="created_by_user") 

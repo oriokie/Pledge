@@ -1,15 +1,15 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, LoginCredentials } from '@/types';
-import { login, getCurrentUser } from '@/lib/api/auth';
+import { useRouter } from 'next/navigation';
+import { User } from '@/types';
+import { login as apiLogin, logout as apiLogout, apiClient } from '@/lib/api';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  error: string | null;
-  handleLogin: (credentials: LoginCredentials) => Promise<void>;
-  handleLogout: () => void;
+  login: (phone_number: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,51 +17,51 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      getCurrentUser(token)
-        .then(setUser)
-        .catch(() => {
-          localStorage.removeItem('token');
-          setUser(null);
-        })
-        .finally(() => setLoading(false));
+      // Set default auth header
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      // For now, create a temporary user object
+      setUser({ id: 1, full_name: 'User', phone_number: '', role: 'admin' });
+      setLoading(false);
     } else {
       setLoading(false);
+      router.push('/login');
     }
-  }, []);
+  }, [router]);
 
-  const handleLogin = async (credentials: LoginCredentials) => {
+  const login = async (phone_number: string, password: string) => {
     try {
-      setError(null);
-      const { access_token } = await login(credentials);
-      localStorage.setItem('token', access_token);
-      const user = await getCurrentUser(access_token);
-      setUser(user);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-      throw err;
+      const response = await apiLogin(phone_number, password);
+      localStorage.setItem('token', response.access_token);
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.access_token}`;
+      // For now, create a temporary user object
+      setUser({ id: 1, full_name: 'User', phone_number: phone_number, role: 'admin' });
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await apiLogout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('token');
+      delete apiClient.defaults.headers.common['Authorization'];
+      setUser(null);
+      router.push('/login');
+    }
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        error,
-        handleLogin,
-        handleLogout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

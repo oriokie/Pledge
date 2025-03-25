@@ -41,8 +41,9 @@ def create_project(
             detail="A project with this name already exists"
         )
     
+    project_data = project_in.dict()
     project = Project(
-        **project_in.dict(),
+        **project_data,
         created_by_id=current_user.id
     )
     db.add(project)

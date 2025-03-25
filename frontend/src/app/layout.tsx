@@ -6,8 +6,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Pledge Management System",
-  description: "Manage pledges and contributions efficiently",
+  title: "Pledge - Contribution Management System",
+  description: "A system for managing contributions and members",
 };
 
 export default function RootLayout({
