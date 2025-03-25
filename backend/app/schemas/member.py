@@ -4,41 +4,44 @@ from datetime import datetime
 from .base import BaseSchema, TimestampSchema
 
 class MemberBase(BaseModel):
-    email: EmailStr
-    phone_number: constr(pattern=r'^\+?1?\d{9,15}$')
-    first_name: str
-    last_name: str
-    role: str = Field(default="member")
+    full_name: str
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    alias1: Optional[str] = None
+    alias2: Optional[str] = None
     is_active: bool = Field(default=True)
 
 class MemberCreate(MemberBase):
     pass
 
 class MemberUpdate(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
     email: Optional[EmailStr] = None
-    phone_number: Optional[constr(pattern=r'^\+?1?\d{9,15}$')] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    role: Optional[str] = None
+    alias1: Optional[str] = None
+    alias2: Optional[str] = None
     is_active: Optional[bool] = None
 
 class Member(MemberBase):
     id: int
-    group_id: int
+    member_code: str
     created_at: datetime
     updated_at: datetime
+    created_by_id: int
 
     class Config:
         from_attributes = True
 
 class MemberInDBBase(MemberBase, TimestampSchema):
     id: int
+    member_code: str
     created_by_id: int
 
 class Member(MemberInDBBase):
     total_contributions: Optional[float] = 0
     total_pledges: Optional[float] = 0
     group_names: Optional[List[str]] = []
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

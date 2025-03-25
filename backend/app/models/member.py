@@ -12,6 +12,8 @@ class Member(Base):
     phone = Column(String, unique=True, index=True)
     email = Column(String, unique=True, nullable=True)
     member_code = Column(String, unique=True, index=True)
+    alias1 = Column(String, nullable=True)
+    alias2 = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

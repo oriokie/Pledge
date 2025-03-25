@@ -1,15 +1,13 @@
-import { Inter } from 'next/font/google';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from '@/contexts/AuthContext';
-import Layout from '@/components/layout/Layout';
-import QueryProvider from '@/providers/QueryProvider';
-import './globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: 'Pledge - Contribution Management System',
-  description: 'A system for managing contributions and pledges',
+export const metadata: Metadata = {
+  title: "Pledge Management System",
+  description: "Manage pledges and contributions efficiently",
 };
 
 export default function RootLayout({
@@ -20,14 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <QueryProvider>
-          <AuthProvider>
-            <Layout>
-              {children}
-            </Layout>
-            <Toaster position="top-right" />
-          </AuthProvider>
-        </QueryProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

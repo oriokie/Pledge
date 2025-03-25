@@ -1,62 +1,67 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@/types';
-import { auth } from '@/lib/api';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, LoginCredentials } from '@/types';
+import { login, getCurrentUser } from '@/lib/api/auth';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
-  login: (phone: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  handleLogin: (credentials: LoginCredentials) => Promise<void>;
+  handleLogout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    checkUser();
+    const token = localStorage.getItem('token');
+    if (token) {
+      getCurrentUser(token)
+        .then(setUser)
+        .catch(() => {
+          localStorage.removeItem('token');
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const checkUser = async () => {
+  const handleLogin = async (credentials: LoginCredentials) => {
     try {
-      const currentUser = await auth.getCurrentUser();
-      setUser(currentUser);
       setError(null);
-    } catch (err) {
-      setUser(null);
-      setError('Failed to fetch user');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = async (phone: string, password: string) => {
-    try {
-      setLoading(true);
-      const { access_token } = await auth.login({ username: phone, password });
+      const { access_token } = await login(credentials);
       localStorage.setItem('token', access_token);
-      await checkUser();
+      const user = await getCurrentUser(access_token);
+      setUser(user);
     } catch (err) {
-      setError('Invalid credentials');
+      setError(err instanceof Error ? err.message : 'Login failed');
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const logout = async () => {
+  const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        handleLogin,
+        handleLogout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,46 +1,39 @@
-import { User } from '@/types';
+import { LoginCredentials, Token, User } from '@/types';
 
-const BASE_URL = '/api/v1/auth';
+const BASE_URL = 'http://localhost:8000/api/v1';
 
-export const auth = {
-  login: async (username: string, password: string): Promise<{ access_token: string; token_type: string }> => {
-    const response = await fetch(`${BASE_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        username,
-        password,
-      }).toString(),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to authenticate');
-    }
-    return response.json();
-  },
+export async function login(credentials: LoginCredentials): Promise<Token> {
+  const formData = new URLSearchParams();
+  formData.append('username', credentials.phone_number);
+  formData.append('password', credentials.password);
 
-  me: async (): Promise<User> => {
-    const response = await fetch(`${BASE_URL}/me`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to get user profile');
-    }
-    return response.json();
-  },
+  const response = await fetch(`${BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: formData,
+  });
 
-  testToken: async (): Promise<User> => {
-    const response = await fetch(`${BASE_URL}/test-token`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to validate token');
-    }
-    return response.json();
-  },
-}; 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Login failed');
+  }
+
+  return response.json();
+}
+
+export async function getCurrentUser(token: string): Promise<User> {
+  const response = await fetch(`${BASE_URL}/auth/me`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to get current user');
+  }
+
+  return response.json();
+} 

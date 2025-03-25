@@ -15,7 +15,7 @@ def generate_unique_code(db: Session) -> str:
     """Generate a unique 6-digit code for a member"""
     while True:
         code = ''.join(random.choices(string.digits, k=6))
-        exists = db.query(Member).filter(Member.unique_code == code).first()
+        exists = db.query(Member).filter(Member.member_code == code).first()
         if not exists:
             return code
 
@@ -42,19 +42,18 @@ def create_member(
     """
     Create new member.
     """
-    member = db.query(Member).filter(
-        Member.phone_number == member_in.phone_number
-    ).first()
-    if member:
-        raise HTTPException(
-            status_code=400,
-            detail="A member with this phone number already exists"
-        )
+    if member_in.phone:
+        member = db.query(Member).filter(Member.phone == member_in.phone).first()
+        if member:
+            raise HTTPException(
+                status_code=400,
+                detail="A member with this phone number already exists"
+            )
     
     member = Member(
         **member_in.dict(),
         created_by_id=current_user.id,
-        unique_code=generate_unique_code(db)
+        member_code=generate_unique_code(db)
     )
     db.add(member)
     db.commit()
@@ -69,34 +68,34 @@ def search_members(
     current_user: User = Depends(deps.get_current_user)
 ) -> Any:
     """
-    Search members by name, alias, phone number, or unique code.
+    Search members by name, alias, phone number, or member code.
     """
     members = db.query(Member).filter(
         or_(
-            Member.name.ilike(f"%{query}%"),
+            Member.full_name.ilike(f"%{query}%"),
             Member.alias1.ilike(f"%{query}%"),
             Member.alias2.ilike(f"%{query}%"),
-            Member.phone_number.ilike(f"%{query}%"),
-            Member.unique_code == query
+            Member.phone.ilike(f"%{query}%"),
+            Member.member_code == query
         )
     ).all()
 
     results = []
     for member in members:
         matched_field = "name"
-        if query.lower() in member.alias1.lower():
+        if query.lower() in (member.alias1 or "").lower():
             matched_field = "alias1"
-        elif query.lower() in member.alias2.lower():
+        elif query.lower() in (member.alias2 or "").lower():
             matched_field = "alias2"
-        elif query in member.phone_number:
+        elif query in (member.phone or ""):
             matched_field = "phone"
-        elif query == member.unique_code:
-            matched_field = "unique_code"
+        elif query == member.member_code:
+            matched_field = "member_code"
         
         results.append(member_schemas.MemberSearchResult(
             id=member.id,
-            name=member.name,
-            unique_code=member.unique_code,
+            name=member.full_name,
+            unique_code=member.member_code,
             matched_field=matched_field
         ))
     
